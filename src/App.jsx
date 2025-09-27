@@ -23,7 +23,7 @@ import { FeedbackProvider } from './Context/FeedbackContext';
 function App() {
   return (
     <FeedbackProvider>
-      <Router>
+      <Router basename="/feedback-app">
         <Header />
         <div className="container">
           <Routes>
