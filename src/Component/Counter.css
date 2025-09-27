@@ -1,0 +1,9 @@
+.Counter-container {
+    background-color: blueviolet;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 1.5rem;
+    border: 2px solid rgb(204, 14, 14);
+    border-radius: 7px;
+}
