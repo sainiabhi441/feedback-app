@@ -23,7 +23,7 @@ import { FeedbackProvider } from './Context/FeedbackContext';
 function App() {
   return (
     <FeedbackProvider>
-      <Router basename="/feedback-app/">
+      <Router basename="/feedback-app">
         <Header />
         <div className="container">
           <Routes>
@@ -31,14 +31,17 @@ function App() {
               path="/"
               element={
                 <>
-                  <FeedbackForm />
-                  <FeedbackList />
+                 <FeedbackForm />
+                  {/* 👇 Average Rating form ke niche, items se upar */}
                   <FeedbackStats />
+                  <FeedbackList />
+
+                  
                 </>
               }
             />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/post/*" element={<Post />} />
+            
           </Routes>
           <Card>
             <NavLink to="/" className={({ isActive }) => (isActive ? 'active' : '')}>

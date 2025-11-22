@@ -1,112 +1,74 @@
-// import React, { createContext, useState } from 'react';
-// import { v4 as uuidv4 } from 'uuid';
-
-// const FeedbackContext = createContext();
-
-// export const FeedbackProvider = ({ children }) => {
-//   const [feedback, setFeedback] = useState([
-//     { id: uuidv4(), text: 'This item is from context', rating: 10 }
-//   ]);
-
-//   const [feedbackEdit, setFeedbackEdit] = useState({
-//     item: {},
-//     edit: false
-//   });
-
-//   const addFeedback = (newFeedback) => {
-//     newFeedback.id = uuidv4();
-//     setFeedback((prev) => [newFeedback, ...prev]);
-//   };
-
-//   const deleteFeedback = (id) => {
-//     if (window.confirm('Are you sure you want to delete?')) {
-//       setFeedback((prev) => prev.filter((item) => item.id !== id));
-//     }
-//   };
-
-//   const editFeedback = (item) => {
-//     setFeedbackEdit({
-//       item,
-//       edit: true,
-//     });
-//   };
-
-//   const clearEdit = () => {
-//     setFeedbackEdit({
-//       item: {},
-//       edit: false,
-//     });
-//   };
-
-//   const updateFeedback = (id, upditem) => {
-//     setFeedback(
-//       feedback.map((item) => (item.id === id ? { ...item, ...upditem } : item))
-//     );
-
-// setFeedbackEdit({
-//       item: {},
-//       edit: false,
-//     });
-
-//   };
-
-//   return (
-//     <FeedbackContext.Provider value={{
-//       feedback,
-//       addFeedback,
-//       deleteFeedback,
-//       feedbackEdit,
-//       editFeedback,
-//       clearEdit,
-//       updateFeedback,
-//     }}>
-//       {children}
-//     </FeedbackContext.Provider>
-//   );
-// };
-
-// export default FeedbackContext;
-
-
-
-
-
-
-
-
-
-
-
-
-import React, { createContext, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import React, { createContext, useState, useEffect } from "react";
 
 const FeedbackContext = createContext();
 
 export const FeedbackProvider = ({ children }) => {
-  const [feedback, setFeedback] = useState([
-    { id: uuidv4(), text: 'This item is from context', rating: 10 }
-  ]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [feedback, setFeedback] = useState([]);
 
   const [feedbackEdit, setFeedbackEdit] = useState({
-    item: null,   // null रखा ताकि safe check किया जा सके
-    edit: false
+    item: null,
+    edit: false,
   });
 
-  // ➕ Add Feedback
-  const addFeedback = (newFeedback) => {
-    newFeedback.id = uuidv4();
-    setFeedback((prev) => [newFeedback, ...prev]);
-  };
+  // 🔗 Backend Base URL from .env
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-  // ❌ Delete Feedback
-  const deleteFeedback = (id) => {
-    if (window.confirm('Are you sure you want to delete?')) {
-      setFeedback((prev) => prev.filter((item) => item.id !== id));
+  useEffect(() => {
+    fetchFeedback();
+  }, []);
+
+  // 📥 Fetch feedback (GET)
+  const fetchFeedback = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/feedback`);
+      const data = await response.json();
+
+      const formatted = data.map((item) => ({
+        id: item._id,
+        text: item.text,
+        rating: item.rating,
+      }));
+
+      setFeedback(formatted);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Fetch Error:", error);
     }
   };
 
-  // ✏️ Edit Feedback
+  // ➕ Add Feedback (POST)
+  const addFeedback = async (newFeedback) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/feedback`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newFeedback),
+      });
+
+      const data = await response.json();
+      const formatted = { id: data._id, text: data.text, rating: data.rating };
+      setFeedback([formatted, ...feedback]);
+    } catch (error) {
+      console.error("Add Error:", error);
+    }
+  };
+
+  // ❌ Delete Feedback (DELETE)
+  const deleteFeedback = async (id) => {
+    if (window.confirm("Are you sure you want to delete?")) {
+      try {
+        await fetch(`${API_BASE_URL}/api/feedback/${id}`, {
+          method: "DELETE",
+        });
+        setFeedback(feedback.filter((item) => item.id !== id));
+      } catch (error) {
+        console.error("Delete Error:", error);
+      }
+    }
+  };
+
+  // ✏️ Edit Feedback (prepare)
   const editFeedback = (item) => {
     setFeedbackEdit({
       item,
@@ -114,23 +76,29 @@ export const FeedbackProvider = ({ children }) => {
     });
   };
 
-  // 🧹 Clear Edit Mode
-  const clearEdit = () => {
-    setFeedbackEdit({
-      item: null,
-      edit: false,
-    });
-  };
+  // 🔄 Update Feedback (PUT)
+  const updateFeedback = async (id, updItem) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/feedback/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updItem),
+      });
 
-  // 🔄 Update Feedback
-  const updateFeedback = (id, updItem) => {
-    setFeedback(
-      feedback.map((item) => (item.id === id ? { ...item, ...updItem } : item))
-    );
-    setFeedbackEdit({
-      item: null,
-      edit: false,
-    });
+      const data = await response.json();
+      const formatted = { id: data._id, text: data.text, rating: data.rating };
+
+      setFeedback(
+        feedback.map((item) => (item.id === id ? formatted : item))
+      );
+
+      setFeedbackEdit({
+        item: null,
+        edit: false,
+      });
+    } catch (error) {
+      console.error("Update Error:", error);
+    }
   };
 
   return (
@@ -140,8 +108,8 @@ export const FeedbackProvider = ({ children }) => {
         addFeedback,
         deleteFeedback,
         feedbackEdit,
+        isLoading,
         editFeedback,
-        clearEdit,
         updateFeedback,
       }}
     >

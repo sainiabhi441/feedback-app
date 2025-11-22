@@ -3,17 +3,21 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://sainiabhi441.github.io/feedback-app/",
+  "proxy": "http://localhost:8000",
+  "homepage": "https://sainiabhi441.github.io/feedback-app",
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "frontend": "vite",
+    "backend": "cd feedback-backend && nodemon server.js",
+    "start": "concurrently \"npm run backend\" \"npm run frontend\"",
     "preview": "vite preview"
   },
   "dependencies": {
-    "framer-motion": "^12.23.15",
+    "framer-motion": "^12.23.22",
     "prop-types": "^15.8.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -26,11 +30,13 @@
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react-swc": "^4.0.0",
+    "concurrently": "^9.2.1",
     "eslint": "^9.33.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "gh-pages": "^6.3.0",
     "globals": "^16.3.0",
+    "nodemon": "^3.1.10",
     "vite": "^7.1.2"
   }
 }

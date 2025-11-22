@@ -1,62 +1,39 @@
-// import { useState, useContext, useEffect } from 'react';
-// import FeedbackContext from '../Context/FeedbackContext';
-
-// function RatingSelect({ select }) {
-//   const [selected, setSelected] = useState(10);
-//   const { feedbackEdit } = useContext(FeedbackContext);
-
-//   useEffect(() => {
-//     setSelected(feedbackEdit.item.rating);
-//   }, [feedbackEdit]);
-
-//   const handleChange = (e) => {
-//     const value = Number(e.currentTarget.value);
-//     setSelected(value);  // update local state immediately
-//     select(value);        // propagate selection up to parent
-//   };
-
-//   return (
-//     <ul className='rating'>
-//       {[...Array(10)].map((_, i) => (
-//         <li key={i + 1}>
-//           <input
-//             type="radio"
-//             id={`num${i + 1}`}              // ✅ fix
-//             name="rating"
-//             value={i + 1}
-//             onChange={handleChange}
-//             checked={selected === i + 1}
-//           />
-//           <label htmlFor={`num${i + 1}`}>{i + 1}</label>   {/* ✅ fix */}
-//         </li>
-//       ))}
-//     </ul>
-//   );
-// }
-
-// export default RatingSelect;
-
-
 
 
 import { useState, useContext, useEffect } from 'react';
 import FeedbackContext from '../Context/FeedbackContext';
 
-function RatingSelect({ select }) {
-  const [selected, setSelected] = useState(10);
+
+
+function RatingSelect({ select, reset, selected }) {
+  const [selectedRating, setSelectedRating] = useState(null);
   const { feedbackEdit } = useContext(FeedbackContext);
 
+  // जब parent से selected value आए तो local state update करो
   useEffect(() => {
-    // Safe check so that red underline / error na aaye
-    if(feedbackEdit.edit ===true && feedbackEdit.item.rating){
-      setSelected(feedbackEdit.item.rating);
+    setSelectedRating(selected);
+  }, [selected]);
+
+  // Edit mode में rating set करना
+  useEffect(() => {
+    if (feedbackEdit?.edit === true && feedbackEdit.item?.rating !== undefined) {
+      setSelectedRating(feedbackEdit.item.rating);
     }
   }, [feedbackEdit]);
 
+  // Reset होने पर clear selected rating
+  useEffect(() => {
+    if (reset === true) {
+      setSelectedRating(null);
+    }
+  }, [reset]);
+
   const handleChange = (e) => {
     const value = Number(e.currentTarget.value);
-    setSelected(value);   // local state update
-    select(value);        // parent ko notify karo
+    setSelectedRating(value);
+    if (select) {
+      select(value);
+    }
   };
 
   return (
@@ -69,7 +46,7 @@ function RatingSelect({ select }) {
             name="rating"
             value={i + 1}
             onChange={handleChange}
-            checked={selected === i + 1}
+            checked={selectedRating === i + 1}
           />
           <label htmlFor={`num${i + 1}`}>{i + 1}</label>
         </li>
