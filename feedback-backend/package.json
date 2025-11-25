@@ -1,1 +1,21 @@
-{"name":"feedback-backend","version":"1.0.0","description":"","main":"index.js","scripts":{"test":"echo \"Error: no test specified\" && exit 1","start":"node server.js","dev":"nodemon server.js","backend":"nodemon server.js"},"keywords":[],"author":"","license":"ISC","dependencies":{"cors":"^2.8.5","dotenv":"^17.2.3","express":"^5.1.0","mongodb":"^7.0.0","mongoose":"^8.19.2"},"devDependencies":{"nodemon":"^3.1.10"}}
+{
+  "name": "feedback-backend",
+  "version": "1.0.0",
+  "description": "Feedback API Backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "author": "abhi saini",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "mongoose": "^8.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

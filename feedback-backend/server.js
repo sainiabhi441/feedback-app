@@ -5,37 +5,35 @@ require("dotenv").config();
 
 const app = express();
 
-// ⭐ Correct CORS Setup for GitHub Pages + Localhost
+// ⭐ Updated CORS for GitHub Pages
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://sainiabhi441.github.io",
-    "https://sainiabhi441.github.io/feedback-frontend"
+    "https://sainiabhi441.github.io/feedback-app"
   ],
-  methods: ["GET", "POST"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
 }));
 
 // Middleware
 app.use(express.json());
 
-// ✅ Routes import (Feedback routes)
 const feedbackRoutes = require("./routes/feedbackRoutes");
 
 // MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/feedbackDB")
   .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
+  .catch((err) => console.error("❌ MongoDB Error:", err));
 
-// ✅ Redirect root URL to /api/feedback
+// Default redirect
 app.get("/", (req, res) => {
   res.redirect("/api/feedback");
 });
 
-// ✅ Use feedback routes
+// Routes
 app.use("/api/feedback", feedbackRoutes);
 
-// ✅ Start server (for Render)
+// Server Start
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, "0.0.0.0", () =>
   console.log(`🚀 Server running on port ${PORT}`)
